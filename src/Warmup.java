@@ -25,11 +25,9 @@ public class Warmup {
         int index =arr.length/2;
         int low=0;
         int high=arr.length-1;
-//        Stack stepstack = new Stack();
         while(!found & low<=high){
             int step = isConsistent(arr);
             if (step==0) {
-                myStack.push(index);
                 if (arr[index] == x) {
                     output = index;
                     found = true;
@@ -43,12 +41,15 @@ public class Warmup {
                     index = (low + high) / 2;
                 }
             }
-            else{
-
-                if (step+1>=index)
-                    high = 2*index+low;
-                else
-                    low = 2*index-high;
+            else {
+                for (int j = 0;!myStack.isEmpty() && j < step; j++) {
+                    int i =(int)myStack.pop();
+                    if (i< index)
+                        low = i;
+                    else
+                        high =i;
+                    index=(high+low)/2;
+                    }
                 }
             }
         return output;
@@ -64,12 +65,18 @@ public class Warmup {
         }
     }
      public static void main(String[] args) {
-//        int[] arr = new int[100];
+        int[] arr = new int[100];
 //        for (int i=0;i<arr.length;i++){
 //            double res =Math.random()*100;
 //            arr[i]= (int)res%100;
-        int[] arr= {0,1,2,3,4,5,6,7,8,9,10};
-        Stack myStack = new Stack();
-         System.out.println(backtrackingSearch(arr,8,2,1,myStack));
+//        int[] arr= {0,1,2,3,4,5,6,7,8,9,10};
+         for (int i=0; i<arr.length;i++){
+             arr[i]=i;
+         }
+
+         for (int i=0;i<arr.length;i++){
+             Stack myStack = new Stack();
+             System.out.println(consistentBinSearch(arr,i,myStack));
+         }
     }
 }
