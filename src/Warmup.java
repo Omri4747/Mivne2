@@ -23,36 +23,32 @@ public class Warmup {
         int output = -1;
         boolean found = false;
         int index =arr.length/2;
-        int from=0;
-        int to=arr.length-1;
-        Stack stepstack = new Stack();
-        while(!found & from<=to){
-            if (isConsistent(arr)==0) {
+        int low=0;
+        int high=arr.length-1;
+//        Stack stepstack = new Stack();
+        while(!found & low<=high){
+            int step = isConsistent(arr);
+            if (step==0) {
                 myStack.push(index);
                 if (arr[index] == x) {
                     output = index;
                     found = true;
                 } else if (arr[index] < x) {
-                    from = index + 1;
-                    stepstack.push(from);
-                    index = (from + to) / 2;
+                    myStack.push(low);
+                    low = index + 1;
+                    index = (high + low) / 2;
                 } else {
-                    to = index - 1;
-                    stepstack.push(to);
-                    index = (from + to) / 2;
+                    myStack.push(high);
+                    high = index - 1;
+                    index = (low + high) / 2;
                 }
             }
             else{
-                int step=0;
-                if (!stepstack.isEmpty()) {
-                    step = (int) stepstack.pop();
-                }
-                if (!myStack.isEmpty())
-                    index = (int) myStack.pop();
+
                 if (step+1>=index)
-                    to = 2*index+from;
+                    high = 2*index+low;
                 else
-                    from = 2*index-to;
+                    low = 2*index-high;
                 }
             }
         return output;
