@@ -20,19 +20,21 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     public Integer search(int x) {
         int output = -1;
         boolean found = false;
-        int index = size / 2;
+        int middle = size / 2;
         int low = 0;
         int high = size - 1;
         while (!found & low <= high) {
-            if (arr[index] == x) {
-                output = index;
+            if (arr[middle] == x) {
+                output = middle;
                 found = true;
-            } else if (arr[index] < x) {        //x is in the right part of the index
-                low = index + 1;
-                index = (high + low) / 2;
-            } else {                            //x is in the left part of the index
-                high = index - 1;
-                index = (low + high) / 2;
+            }
+            else if (arr[middle] < x) {        //x is in the right part of the index
+                low = middle + 1;
+                middle = (high + low) / 2;
+            }
+            else {                            //x is in the left part of the index
+                high = middle - 1;
+                middle = (low + high) / 2;
             }
         }
         return output;
@@ -44,14 +46,11 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
         for (int i=0;i<size;i++){
             stored[i]=arr[i];
         }
-        int index = search(x);
-        if (index==-1){             //array doesn't contain x
-            stack.push(stored);
-            stack.push("insert");
-            arr[size]=x;
-            size=size+1;
-            bubblesort(arr);
-        }
+        stack.push(stored);
+        stack.push("insert");
+        arr[size]=x;
+        size++;
+        bubblesort(arr);
     }
 
     //sorting a sorted array with 1 element unsorted at the end of the array
@@ -79,7 +78,8 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
         for (int i=index;i<size-1;i++){
             arr[i]=arr[i+1];
         }
-        size=size-1;
+        arr[size-1]=0;
+        size--;
     }
 
     @Override
@@ -95,15 +95,29 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     @Override
     public Integer successor(Integer index) {
         if (index==size-1)
-            throw new IllegalArgumentException("no successor");
-        return arr[index+1];
+            throw new IllegalArgumentException("maximum, none successor");
+        Integer output = null;
+        for (int i=index+1;i<size;i++){
+            if (arr[index]<arr[i])
+                output= arr[i];
+        }
+        if (output==null)
+            throw new IllegalArgumentException("no successor found");
+        return output;
     }
 
     @Override
     public Integer predecessor(Integer index) {
         if (index==0)
-            throw new IllegalArgumentException("no predecessor");
-        return arr[index-1];
+            throw new IllegalArgumentException("minimum, none successor");
+        Integer output = null;
+        for (int i=index-1;i<size;i--){
+            if (arr[index]>arr[i])
+                output= arr[i];
+        }
+        if (output==null)
+            throw new IllegalArgumentException("no successor found");
+        return output;
     }
 
     @Override
@@ -141,13 +155,18 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     public static void main(String[] args) {
         Stack st = new Stack();
         BacktrackingSortedArray A = new BacktrackingSortedArray(st,100);
-        for (int i=0;i<100;i++){
-            A.insert((i*22)%100);
+        for (int i=0;i<20;i++){
+            A.insert((int)Math.pow(-1,i)*i);
         }
         A.print();
-        A.delete(5);
+        for (int i=0;i<5;i++){
+            A.delete(i+10);
+            A.insert(i+102);
+        }
         A.print();
-        A.backtrack();
-        A.print();
+        for (int i=0;i<10;i++){
+            A.backtrack();
+            A.print();
+        }
     }
 }
