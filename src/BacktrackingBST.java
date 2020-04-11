@@ -2,11 +2,13 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     private Stack stack;
     private Stack redoStack;
     BacktrackingBST.Node root = null;
+    private Integer nevo;
 
     // Do not change the constructor's signature
     public BacktrackingBST(Stack stack, Stack redoStack) {
         this.stack = stack;
         this.redoStack = redoStack;
+        nevo = 0;
     }
 
     public Node getRoot() {
