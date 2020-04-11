@@ -14,7 +14,19 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     }
 
     public Node search(int x) {
-        // TODO: implement your code here
+        Node curr = root;
+        boolean found = false;
+        while (curr != null & !found) {
+            if (curr.key == x)
+                found = true;
+            else {
+                if (x < curr.key)
+                    curr = curr.left;
+                else
+                    curr = curr.right;
+            }
+        }
+        return curr;
     }
 
     public void insert(BacktrackingBST.Node z) {
@@ -48,6 +60,8 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             y.right=z;
     }
 
+
+    //NOT FINISHED!!!
     public void delete(Node x) {
         if (!stack.isEmpty()) {
             String what = (String) stack.pop();
@@ -57,7 +71,35 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 stack.push("delete");
             }
         }
+        else {
+            stack.push(x);
+            stack.push("delete");
+        }
+        if (x.left == null & x.right == null){ //x has no children
+            if (x.key > x.parent.key)
+                x.parent.right = null;
+            else
+                x.parent.left = null;
+        }
+        else if (x.left != null & x.right != null ){ //x has two children
+            Node success = successor(x);
+            if (success.right == null)
+                success.parent.right = null;
+            else {
+                success.parent.right = success.right;
+            }
+            x.key = success.key;
+        }
 
+        else //x has one children
+            if (x.left != null) {
+                x.parent.left = x.left;
+                x.left.parent = x.parent;
+            }
+            else {
+                x.parent.left = x.right;
+                x.right.parent = x.parent;
+            }
     }
 
     public Node minimum() {
