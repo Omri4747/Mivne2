@@ -30,17 +30,13 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     }
 
     public void insert(BacktrackingBST.Node z) {
-        if (!stack.isEmpty()) {
-            String what = (String) stack.pop();
-            if (!what.equals("backtrack")) {
-                stack.push(what);
-                stack.push(z);
-                stack.push("insert");
-            }
-        } else {
-            stack.push(z);
-            stack.push("insert");
-        }
+        stack.push(z);
+        stack.push("insert");
+        insert1(z);
+    }
+
+    //insert without pushing element to the stack
+    private void insert1(BacktrackingBST.Node z){
         Node y = null;
         Node x = root;
         while (x != null) {
@@ -62,23 +58,21 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     //finished, except for the stuck pushing
     public void delete(Node x) {
-        if (!stack.isEmpty()) {
-            String what = (String) stack.pop();
-            if (!what.equals("backtrack")) {
-                stack.push(what);
-                stack.push(x);
-                stack.push("delete");
-            }
-        } else {
-            stack.push(x);
-            stack.push("delete");
-        }
-        if (x.left == null & x.right == null)  //x has no children
+        BacktrackingBST T = new BacktrackingBST(stack,redoStack);
+        if (x.left == null & x.right == null) {  //x has no children
             x.deleteZeroSons();
+            stack.push(x);
+            stack.push("delete0");
+        }
         else if (x.left != null & x.right != null)  //x has two children
-            x.deleteTwoSons(x, successor(x));
-        else //x has one children
+            x.deleteTwoSons(successor(x));
+        else {//x has one children
             x.deleteOneSon();
+            stack.push(x);
+            stack.push(x.parent);
+            stack.push(x.whichSon());
+            stack.push("delete1");
+        }
     }
 
 
@@ -126,7 +120,34 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     @Override
     public void backtrack() {
-        // TODO: implement your code here
+        String action = (String) stack.pop();
+        if (action.equals("insert")) {
+            Node toRemove = (Node) stack.pop();
+            toRemove.deleteZeroSons();
+        }
+        else
+            insertbacktrack();
+
+    }
+
+    private void insertbacktrack(){
+        String action = (String) stack.pop();
+        if (action.equals("delete0")){
+            insert1((Node)stack.pop());
+        }
+        else if (action.equals("delete1")){
+            String side = (String) stack.pop();
+            Node father = (Node) stack.pop();
+            Node toinsert = (Node) stack.pop();
+            if (side.equals("left")){
+                if (father.left.key>toinsert.key)
+                    toinsert.right=father.left;
+                else
+                    toinsert.left=father.left;
+                father.left=toinsert;
+                toinsert.parent=father;
+            }
+        }
     }
 
     @Override
@@ -164,21 +185,21 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             return value;
         }
 
-        public Node minimum() {
+        private Node minimum() {
             if (left == null)
                 return this;
             else
                 return left.minimum();
         }
 
-        public Node maximum() {
+        private Node maximum() {
             if (right == null)
                 return this;
             else
                 return right.minimum();
         }
 
-        public String printPreOrder(String output) {
+        private String printPreOrder(String output) {
             if (this == null)
                 return output;
             output = output + this.key;
@@ -225,20 +246,20 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             }
         }
 
-        private static void deleteTwoSons(Node x, Node successor) {
+        private void deleteTwoSons(Node successor) {
             if (successor.right != null)
                 successor.deleteOneSon();
             else
                 successor.deleteZeroSons();
-            successor.parent = x.parent;
-            successor.left = x.left;
-            successor.right = x.right;
-            x.left.parent = successor;
-            x.right.parent = successor;
-            if (x.whichSon().equals("left"))
-                x.parent.left = successor;
+            successor.parent = parent;
+            successor.left = left;
+            successor.right = right;
+            left.parent = successor;
+            right.parent = successor;
+            if (whichSon().equals("left"))
+                parent.left = successor;
             else
-                x.parent.right = successor;
+                parent.right = successor;
         }
     }
 }
