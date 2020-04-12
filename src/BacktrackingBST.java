@@ -26,6 +26,8 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                     curr = curr.right;
             }
         }
+        if (!found)
+            curr=null;
         return curr;
     }
 
@@ -105,29 +107,43 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     public Node minimum() {
         if (root==null)
             throw new IllegalArgumentException("empty tree");
-        Node output = root;
-        while(output.left!=null){
-            output=output.left;
-        }
+        Node output = root.minimum();
         return output;
     }
 
     public Node maximum() {
         if (root==null)
             throw new IllegalArgumentException("empty tree");
-        Node output = root;
-        while(output.right!=null){
-            output=output.right;
-        }
+        Node output = root.maximum();
         return output;
     }
 
     public Node successor(Node x) {
-        // TODO: implement your code here
+        Node output;
+        if (x.right!=null)
+            output = x.right.minimum();
+        else {
+            output = x.parent;
+            while (output != null & x == output.right) {
+                x = output;
+                output = output.parent;
+            }
+        }
+        return output;
     }
 
     public Node predecessor(Node x) {
-        // TODO: implement your code here
+        Node output;
+        if (x.left!=null)
+            output = x.left.maximum();
+        else {
+            output = x.parent;
+            while (output != null & x == output.left) {
+                x = output;
+                output = output.parent;
+            }
+        }
+        return output;
     }
 
     @Override
@@ -146,8 +162,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     @Override
     public void print() {
-        // TODO: implement your code here
-
+        printPreOrder();
     }
 
     public static class Node{
@@ -171,11 +186,25 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             return value;
         }
 
+        public Node minimum() {
+            if (left==null)
+                return this;
+            else
+                return left.minimum();
+        }
+
+        public Node maximum(){
+            if (right==null)
+                return this;
+            else
+                return right.minimum();
+        }
+
         public String printPreOrder(String output){
             if (this==null)
                 return output;
             output = output + this.key;
-            if (this.left!=null)
+            if (left!=null)
                 output=left.printPreOrder(output + " ");
             if (right!=null)
                 output=right.printPreOrder(output+" ");
