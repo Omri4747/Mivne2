@@ -26,8 +26,6 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                     curr = curr.right;
             }
         }
-        if (!found)
-            curr=null;
         return curr;
     }
 
@@ -85,12 +83,16 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
         }
         else if (x.left != null & x.right != null ){ //x has two children
             Node success = successor(x);
-            if (success.right == null)
+            if (success.right == null)      // leaf
                 success.parent.right = null;
-            else {
+            else {                          // 1 children
                 success.parent.right = success.right;
             }
-            x.key = success.key;
+            success.parent=x.parent;
+            success.left=x.left;
+            success.right=x.right;
+            x.left.parent=success;
+            x.right.parent=success;
         }
 
         else //x has one children
@@ -99,7 +101,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 x.left.parent = x.parent;
             }
             else {
-                x.parent.left = x.right;
+                x.parent.right = x.right;
                 x.right.parent = x.parent;
             }
     }
