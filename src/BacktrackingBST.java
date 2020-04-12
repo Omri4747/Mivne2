@@ -15,10 +15,9 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     public Node search(int x) {
         Node curr = root;
-        boolean found = false;
-        while (curr != null & !found) {
+        while (curr != null) {
             if (curr.key == x)
-                found = true;
+                break;
             else {
                 if (x < curr.key)
                     curr = curr.left;
