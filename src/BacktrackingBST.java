@@ -3,6 +3,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     private Stack redoStack;
     BacktrackingBST.Node root = null;
 
+
     // Do not change the constructor's signature
     public BacktrackingBST(Stack stack, Stack redoStack) {
         this.stack = stack;
@@ -36,31 +37,30 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 stack.push(z);
                 stack.push("insert");
             }
-        }
-        else{
+        } else {
             stack.push(z);
             stack.push("insert");
         }
         Node y = null;
         Node x = root;
-        while (x!=null){
-            y=x;
-            if (z.key<x.key)
-                x=x.left;
+        while (x != null) {
+            y = x;
+            if (z.key < x.key)
+                x = x.left;
             else
-                x=x.right;
+                x = x.right;
         }
-        z.parent=y;
-        if (y==null)
-            root=z;     //tree was empty
-        else if (z.key<y.key)
-            y.left=z;
+        z.parent = y;
+        if (y == null)
+            root = z;     //tree was empty
+        else if (z.key < y.key)
+            y.left = z;
         else
-            y.right=z;
+            y.right = z;
     }
 
 
-    //NOT FINISHED!!!
+    //finished, except for the stuck pushing
     public void delete(Node x) {
         if (!stack.isEmpty()) {
             String what = (String) stack.pop();
@@ -69,51 +69,28 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 stack.push(x);
                 stack.push("delete");
             }
-        }
-        else {
+        } else {
             stack.push(x);
             stack.push("delete");
         }
-        if (x.left == null & x.right == null){ //x has no children
-            if (x.key > x.parent.key)
-                x.parent.right = null;
-            else
-                x.parent.left = null;
-        }
-        else if (x.left != null & x.right != null ){ //x has two children
-            Node success = successor(x);
-            if (success.right == null)      // leaf
-                success.parent.right = null;
-            else {                          // 1 children
-                success.parent.right = success.right;
-            }
-            success.parent=x.parent;
-            success.left=x.left;
-            success.right=x.right;
-            x.left.parent=success;
-            x.right.parent=success;
-        }
-
+        if (x.left == null & x.right == null)  //x has no children
+            x.deleteZeroSons();
+        else if (x.left != null & x.right != null)  //x has two children
+            x.deleteTwoSons(x, successor(x));
         else //x has one children
-            if (x.left != null) {
-                x.parent.left = x.left;
-                x.left.parent = x.parent;
-            }
-            else {
-                x.parent.right = x.right;
-                x.right.parent = x.parent;
-            }
+            x.deleteOneSon();
     }
 
+
     public Node minimum() {
-        if (root==null)
+        if (root == null)
             throw new IllegalArgumentException("empty tree");
         Node output = root.minimum();
         return output;
     }
 
     public Node maximum() {
-        if (root==null)
+        if (root == null)
             throw new IllegalArgumentException("empty tree");
         Node output = root.maximum();
         return output;
@@ -121,7 +98,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     public Node successor(Node x) {
         Node output;
-        if (x.right!=null)
+        if (x.right != null)
             output = x.right.minimum();
         else {
             output = x.parent;
@@ -135,7 +112,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     public Node predecessor(Node x) {
         Node output;
-        if (x.left!=null)
+        if (x.left != null)
             output = x.left.maximum();
         else {
             output = x.parent;
@@ -157,7 +134,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
         // TODO: implement your code here
     }
 
-    public void printPreOrder(){
+    public void printPreOrder() {
         root.printPreOrder("");
     }
 
@@ -166,8 +143,8 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
         printPreOrder();
     }
 
-    public static class Node{
-    	//These fields are public for grading purposes. By coding conventions and best practice they should be private.
+    public static class Node {
+        //These fields are public for grading purposes. By coding conventions and best practice they should be private.
         public BacktrackingBST.Node left;
         public BacktrackingBST.Node right;
         private BacktrackingBST.Node parent;
@@ -188,29 +165,83 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
         }
 
         public Node minimum() {
-            if (left==null)
+            if (left == null)
                 return this;
             else
                 return left.minimum();
         }
 
-        public Node maximum(){
-            if (right==null)
+        public Node maximum() {
+            if (right == null)
                 return this;
             else
                 return right.minimum();
         }
 
-        public String printPreOrder(String output){
-            if (this==null)
+        public String printPreOrder(String output) {
+            if (this == null)
                 return output;
             output = output + this.key;
-            if (left!=null)
-                output=left.printPreOrder(output + " ");
-            if (right!=null)
-                output=right.printPreOrder(output+" ");
+            if (left != null)
+                output = left.printPreOrder(output + " ");
+            if (right != null)
+                output = right.printPreOrder(output + " ");
             return output;
         }
-    }
 
+        private String whichSon() {
+            if (key > parent.key)
+                return "right";
+            else
+                return "left";
+        }
+
+        private void deleteZeroSons() {
+            if (whichSon().equals("left"))
+                parent.left = null;
+            else
+                parent.right = null;
+        }
+
+        private void deleteOneSon() {
+            if (whichSon().equals("left")) {
+                if (left != null) {
+                    parent.left = left;
+                    left.parent = parent;
+                } else {
+                    parent.left = right;
+                    right.parent = parent;
+                }
+            }
+            else {
+                if (left != null){
+                    parent.right = left;
+                    left.parent = parent;
+                }
+                else {
+                    parent.right = right;
+                    right.parent = parent;
+                }
+            }
+        }
+
+        private static void deleteTwoSons(Node x, Node successor) {
+            if (successor.right != null)
+                successor.deleteOneSon();
+            else
+                successor.deleteZeroSons();
+            successor.parent = x.parent;
+            successor.left = x.left;
+            successor.right = x.right;
+            x.left.parent = successor;
+            x.right.parent = successor;
+            if (x.whichSon().equals("left"))
+                x.parent.left = successor;
+            else
+                x.parent.right = successor;
+        }
+    }
 }
+
+
+
