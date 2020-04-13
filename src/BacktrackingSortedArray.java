@@ -145,7 +145,7 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
         for (int i=1; i<size;i++){
             toprint= toprint + " " + arr[i];
         }
-        System.out.println(toprint);
+        System.out.print(toprint);
     }
 
     private boolean rangecheck(int index){

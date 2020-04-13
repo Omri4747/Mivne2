@@ -129,7 +129,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     }
 
     public void printPreOrder() {
-        root.printPreOrder("");
+        System.out.println(root.printPreOrder(""));
     }
 
     @Override

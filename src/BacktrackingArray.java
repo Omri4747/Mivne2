@@ -132,7 +132,7 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
     public void print() {
         for (int i = 0; i < size; i++) {
             if (i == size - 1)
-                System.out.println(arr[i]);
+                System.out.print(arr[i]);
             else
                 System.out.print(arr[i] + " ");
         }
@@ -144,7 +144,6 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
         for (int i = 0; i < 4; i++) {
             A.insert(i);
         }
-        System.out.println(A.predecessor(2));
-        System.out.println(A.successor(A.minimum));
+        A.print();
     }
 }
