@@ -12,7 +12,7 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     @Override
     public Integer get(int index){
         if (!rangecheck(index))
-            throw new ArrayIndexOutOfBoundsException();
+            return -1;
         return arr[index];
     }
 
@@ -67,70 +67,78 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
 
     @Override
     public void delete(Integer index) {
-        if (!rangecheck(index))
-            throw new ArrayIndexOutOfBoundsException();
-        int[] stored = new int[arr.length];
-        for (int i=0;i<size;i++){
-            stored[i]=arr[i];
+        if (rangecheck(index)) {
+            int[] stored = new int[arr.length];
+            for (int i = 0; i < size; i++) {
+                stored[i] = arr[i];
+            }
+            stack.push(stored);
+            stack.push("delete");
+            for (int i = index; i < size - 1; i++) {
+                arr[i] = arr[i + 1];
+            }
+            arr[size - 1] = 0;
+            size--;
         }
-        stack.push(stored);
-        stack.push("delete");
-        for (int i=index;i<size-1;i++){
-            arr[i]=arr[i+1];
-        }
-        arr[size-1]=0;
-        size--;
     }
 
     @Override
     public Integer minimum() {
-        return arr[0];
+        if (size==0)
+            return -1;
+        else
+            return 0;
     }
 
     @Override
     public Integer maximum() {
-        return arr[size-1];
+        if (size==0)
+            return -1;
+        else
+            return size-1;
     }
 
     @Override
     public Integer successor(Integer index) {
-        if (index==size-1)
-            throw new IllegalArgumentException("maximum, none successor");
-        Integer output = null;
+        Integer output = -1;
+        if (!rangecheck(index) || (index==size-1) | arr[index]==arr[size-1])
+            return output;
+
         for (int i=index+1;i<size;i++){
-            if (arr[index]<arr[i])
-                output= arr[i];
+            if (arr[index]<arr[i]) {
+                output = i;
+                break;
+            }
         }
-        if (output==null)
-            throw new IllegalArgumentException("no successor found");
         return output;
     }
 
     @Override
     public Integer predecessor(Integer index) {
-        if (index==0)
-            throw new IllegalArgumentException("minimum, none successor");
-        Integer output = null;
+        Integer output = -1;
+        if (!rangecheck(index) || (index==0) | arr[index]==arr[0])
+            return output;
         for (int i=index-1;i<size;i--){
-            if (arr[index]>arr[i])
-                output= arr[i];
+            if (arr[index]>arr[i]) {
+                output = i;
+                break;
+            }
         }
-        if (output==null)
-            throw new IllegalArgumentException("no successor found");
         return output;
     }
 
     @Override
     public void backtrack() {
-        Object what = stack.pop();
-        Object previousarr = stack.pop();
-        if (what.equals("delete")){
-            size=size+1;
-            arr=(int[])previousarr;
-        }
-        else if (what.equals("insert")){
-            size=size-1;
-            arr=(int[])previousarr;
+        if (!stack.isEmpty()) {
+            Object what = stack.pop();
+            Object previousarr = stack.pop();
+            if (what.equals("delete")) {
+                size = size + 1;
+                arr = (int[]) previousarr;
+            } else if (what.equals("insert")) {
+                size = size - 1;
+                arr = (int[]) previousarr;
+            }
         }
     }
 

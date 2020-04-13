@@ -9,20 +9,22 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
     public BacktrackingArray(Stack stack, int size) {
         this.stack = stack;
         arr = new int[size];
-        minimum = Integer.MAX_VALUE;
-        maximum = Integer.MIN_VALUE;
+        minimum = -1;
+        maximum = size;
         this.size = 0;
     }
 
     @Override
     public Integer get(int index) {
+        if (index>=size | index<0)
+            return -1;
         return arr[index];
     }
 
     @Override
     public Integer search(int x) {
         Integer output = -1;
-        if (x < minimum | x > maximum)
+        if (x<arr[minimum] | x>arr[maximum])
             return output;
         for (int i = 0; i < size; i++) {
             if (arr[i] == x) {
@@ -38,33 +40,42 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
         stack.push(minimum);
         stack.push(maximum);
         stack.push("insert");
-        arr[size] = x;
-        size++;
-        if (x < minimum) {//if x is new minimum
-            minimum = x;
+        if (size==0){
+            arr[0]=x;
+            minimum=0;
+            maximum=0;
+            size++;
         }
-        if (x > maximum) {//if x is new maximum
-            maximum = x;
+        else {
+            arr[size] = x;
+            size++;
+            if (x < arr[minimum]) {//if x is the new minimum
+                minimum = size - 1;
+            }
+            if (x > arr[maximum]) {//if x is the new maximum
+                maximum = size - 1;
+            }
         }
     }
 
 
     @Override
     public void delete(Integer index) {
-        stack.push(arr[index]);
-        stack.push(minimum);
-        stack.push(maximum);
-        stack.push(index);
-        stack.push("delete");
-        Integer temp = arr[index];
-        if (temp == minimum)
-            minimum = successor(index);
-        else if (temp == maximum) {
-            maximum = predecessor(index);
+        if (index<size & index>=0) {
+            stack.push(arr[index]);
+            stack.push(minimum);
+            stack.push(maximum);
+            stack.push(index);
+            stack.push("delete");
+            if (index == minimum)
+                minimum = successor(index);
+            else if (index == maximum) {
+                maximum = predecessor(index);
+            }
+            arr[index] = arr[size - 1];
+            arr[size - 1] = 0;
+            size--;
         }
-        arr[index] = arr[size - 1];
-        arr[size - 1] = 0;
-        size--;
     }
 
     @Override
@@ -79,13 +90,13 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
 
     @Override
     public Integer successor(Integer index) {
-        if (arr[index] == maximum) {
-            throw new RuntimeException("maximum, none successor");
+        if (index == maximum) {
+            return -1;
         }
         Integer curr = maximum;
         for (int i = 0; i < size; i++) {
-            if ((arr[i] > arr[index]) & (arr[i] < curr)) {
-                curr = arr[i];
+            if ((arr[i] > arr[index]) & (arr[i] < arr[curr])) {
+                curr = i;
             }
         }
         return curr;
@@ -93,13 +104,13 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
 
     @Override
     public Integer predecessor(Integer index) {
-        if (arr[index] == minimum()) {
-            throw new RuntimeException("minimum, none predecessor");
+        if (index == minimum()) {
+            return -1;
         }
         Integer curr = minimum;
         for (int i = 0; i < size; i++) {
-            if ((arr[i] < arr[index]) & (arr[i] > curr)) {
-                curr = arr[i];
+            if ((arr[i] < arr[index]) & (arr[i] > arr[curr])) {
+                curr = i;
             }
         }
         return curr;
@@ -107,19 +118,22 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
 
     @Override
     public void backtrack() {
-        String action = (String) stack.pop();
-        if (action.equals("insert")) {
-            arr[size - 1] = 0;
-            size--;
-            maximum = (Integer) stack.pop();
-            minimum = (Integer) stack.pop();
-        } else if (action.equals("delete")) {
-            Integer index = (Integer) stack.pop();
-            maximum = (Integer) stack.pop();
-            minimum = (Integer) stack.pop();
-            Integer value = (Integer) stack.pop();
-            arr[size] = arr[index];
-            arr[index] = value;
+        if (!stack.isEmpty()) {
+            String action = (String) stack.pop();
+            if (action.equals("insert")) {
+                arr[size - 1] = 0;
+                size--;
+                maximum = (Integer) stack.pop();
+                minimum = (Integer) stack.pop();
+            } else if (action.equals("delete")) {
+                Integer index = (Integer) stack.pop();
+                maximum = (Integer) stack.pop();
+                minimum = (Integer) stack.pop();
+                Integer value = (Integer) stack.pop();
+                arr[size] = arr[index];
+                arr[index] = value;
+                size++;
+            }
         }
     }
 
