@@ -12,7 +12,7 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     @Override
     public Integer get(int index){
         if (!rangecheck(index))
-            return -1;
+            return null;
         return arr[index];
     }
 

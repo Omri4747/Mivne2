@@ -17,7 +17,7 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
     @Override
     public Integer get(int index) {
         if (index>=size | index<0)
-            return -1;
+            return null;
         return arr[index];
     }
 
