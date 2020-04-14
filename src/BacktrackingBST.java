@@ -46,7 +46,6 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
         else if (x.left != null & x.right != null) {  //x has two children
             Node successor = successor(x);
             stack.push(x);
-            stack.push(successor);
             stack.push(successor.parent);
             deleteTwoSons(x,successor);
             stack.push("delete2");
@@ -71,7 +70,6 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
         Node output = root.maximum();
         return output;
     }
-
 
     public Node successor(Node x) {
         Node output;
@@ -205,6 +203,10 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             mySuccessor.left.parent = mySuccessor;
         if (mySuccessor.parent == null)
             root = mySuccessor;
+        else if (mySuccessor.key < mySuccessor.parent.key)
+            mySuccessor.parent.left = mySuccessor;
+        else
+            mySuccessor.parent.right = mySuccessor;
     }
 
     private void insertbacktrack(){
@@ -238,16 +240,19 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 redoStack.push("delete");
         }
         else{                                   //last delete had two sons
-            Node wbf = (Node) stack.pop();     //wbf stands for will be father
-            Node mySuccessor = (Node) stack.pop();
+            Node wbf = (Node) stack.pop();     //wbf stands for 'will be father'
             Node toinsert = (Node) stack.pop();
+            Node mySuccessor = toinsert.left.parent;
             redoStack.push(toinsert);
             redoStack.push("delete");
             if (wbf.key==toinsert.key) {      //the successor was the right son of to insert
-                toinsert.right = mySuccessor;
                 mySuccessor.parent = toinsert;
-                toinsert.left=mySuccessor.left;
+                toinsert.left.parent = toinsert;
                 mySuccessor.left=null;
+                if (toinsert.parent.key > toinsert.key)
+                    toinsert.parent.left = toinsert;
+                else
+                    toinsert.parent.right = toinsert;
             }
             else {
                 toinsert.right=mySuccessor.right;
