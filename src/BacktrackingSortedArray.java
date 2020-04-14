@@ -42,44 +42,40 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
 
     @Override
     public void insert(Integer x) {
-        int[] stored = new int[arr.length];
-        for (int i=0;i<size;i++){
-            stored[i]=arr[i];
-        }
-        stack.push(stored);
+        stack.push(toInsert(x));
         stack.push("insert");
-        arr[size]=x;
-        size++;
-        bubblesort(arr);
     }
 
     //sorting a sorted array with 1 element unsorted at the end of the array
-    private void bubblesort(int[] arr){
-        for (int i=size-1;i>0;i--){
-            if (arr[i]<arr[i-1]){
-                int temp= arr[i];
-                arr[i]=arr[i-1];
-                arr[i-1]=temp;
-            }
+    // and return the index it was inserted
+    private int toInsert(Integer x){
+        arr[size]=x;
+        size++;
+        int i=size-1;
+        while (i>0 && x<arr[i-1]){
+            arr[i]=arr[i-1];
+            arr[i-1]=x;
+            i--;
         }
+        return i;
     }
 
 
     @Override
     public void delete(Integer index) {
         if (rangecheck(index)) {
-            int[] stored = new int[arr.length];
-            for (int i = 0; i < size; i++) {
-                stored[i] = arr[i];
-            }
-            stack.push(stored);
+            stack.push(arr[index]);
             stack.push("delete");
-            for (int i = index; i < size - 1; i++) {
-                arr[i] = arr[i + 1];
-            }
-            arr[size - 1] = 0;
-            size--;
+            toDelete(index);
         }
+    }
+
+    private void toDelete (Integer index){
+        for (int i = index; i < size - 1; i++) {
+            arr[i] = arr[i + 1];
+        }
+        arr[size - 1] = 0;
+        size--;
     }
 
     @Override
@@ -118,7 +114,7 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
         Integer output = -1;
         if (!rangecheck(index) || (index==0) | arr[index]==arr[0])
             return output;
-        for (int i=index-1;i<size;i--){
+        for (int i=index-1;i>=0;i--){
             if (arr[index]>arr[i]) {
                 output = i;
                 break;
@@ -130,14 +126,13 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     @Override
     public void backtrack() {
         if (!stack.isEmpty()) {
-            Object what = stack.pop();
-            Object previousarr = stack.pop();
-            if (what.equals("delete")) {
-                size = size + 1;
-                arr = (int[]) previousarr;
-            } else if (what.equals("insert")) {
-                size = size - 1;
-                arr = (int[]) previousarr;
+            Object action = stack.pop();
+            Integer value = (Integer) stack.pop();
+            if (action.equals("delete")) {
+                toInsert(value);
+            }
+            else if (action.equals("insert")) {
+                toDelete(value);
             }
         }
     }
