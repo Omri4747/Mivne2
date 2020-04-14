@@ -149,11 +149,12 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
 
     @Override
     public void print() {
-        String toprint = ""+arr[0];
-        for (int i=1; i<size;i++){
-            toprint= toprint + " " + arr[i];
+        for (int i = 0; i < size; i++) {
+            if (i == size - 1)
+                System.out.print(arr[i]);
+            else
+                System.out.print(arr[i] + " ");
         }
-        System.out.print(toprint);
     }
 
     private boolean rangecheck(int index){
@@ -163,18 +164,20 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     public static void main(String[] args) {
         Stack st = new Stack();
         BacktrackingSortedArray A = new BacktrackingSortedArray(st,100);
-        for (int i=0;i<20;i++){
-            A.insert((int)Math.pow(-1,i)*i);
-        }
-        A.print();
         for (int i=0;i<5;i++){
-            A.delete(i+10);
-            A.insert(i+102);
+            A.insert(i);
         }
         A.print();
-        for (int i=0;i<10;i++){
+        System.out.println("\n");
+        for (int i=0;i<5;i++){
             A.backtrack();
-            A.print();
         }
+        A.print();
+//        System.out.println("\n");
+//        for (int i=0;i<10;i++){
+//            A.backtrack();
+//            A.print();
+//            System.out.println("\n");
+
     }
 }
