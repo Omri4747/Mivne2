@@ -16,7 +16,7 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
 
     @Override
     public Integer get(int index) {
-        if (index>=size | index<0)
+        if (index >= size | index < 0)
             return null;
         return arr[index];
     }
@@ -24,7 +24,7 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
     @Override
     public Integer search(int x) {
         Integer output = -1;
-        if (x<arr[minimum] | x>arr[maximum])
+        if (x < arr[minimum] | x > arr[maximum])
             return output;
         for (int i = 0; i < size; i++) {
             if (arr[i] == x) {
@@ -40,13 +40,12 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
         stack.push(minimum);
         stack.push(maximum);
         stack.push("insert");
-        if (size==0){
-            arr[0]=x;
-            minimum=0;
-            maximum=0;
+        if (size == 0) {
+            arr[0] = x;
+            minimum = 0;
+            maximum = 0;
             size++;
-        }
-        else {
+        } else {
             arr[size] = x;
             size++;
             if (x < arr[minimum]) {//if x is the new minimum
@@ -61,7 +60,7 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
 
     @Override
     public void delete(Integer index) {
-        if (index<size & index>=0) {
+        if (index < size & index >= 0) {
             stack.push(arr[index]);
             stack.push(minimum);
             stack.push(maximum);
@@ -90,7 +89,7 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
 
     @Override
     public Integer successor(Integer index) {
-        if (index == maximum) {
+        if (arr[index] == arr[maximum]) {
             return -1;
         }
         Integer curr = maximum;
@@ -104,7 +103,7 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
 
     @Override
     public Integer predecessor(Integer index) {
-        if (index == minimum()) {
+        if (arr[index] == arr[minimum]) {
             return -1;
         }
         Integer curr = minimum;
@@ -154,10 +153,25 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
 
     public static void main(String[] args) {
         Stack st = new Stack();
-        BacktrackingArray A = new BacktrackingArray(st, 20);
-        for (int i = 0; i < 4; i++) {
-            A.insert(i);
+        BacktrackingArray A = new BacktrackingArray(st, 25);
+        for (int i = 1; i < 21; i++) {
+            Integer toIn = (int) (100 * (Math.random()) % 100);
+            A.insert(toIn);
         }
         A.print();
+        System.out.println("\n" + A.maximum);
+        System.out.println(A.minimum);
+        for (int j = 0; j < 5; j++) {
+            A.delete(5);
+            A.print();
+            System.out.println("\n");
+        }
+        for (int j = 0; j < 5; j++) {
+            A.backtrack();
+            A.print();
+            System.out.println("\n");
+        }
+        System.out.println("\n" + A.maximum);
+        System.out.println(A.minimum);
     }
 }
