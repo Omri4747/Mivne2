@@ -38,9 +38,8 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     //finished, except for the stuck pushing
     public void delete(Node x) {
-        BacktrackingBST T = new BacktrackingBST(stack,redoStack);
         if (x.left == null & x.right == null) {  //x has no children
-            x.deleteZeroSons();
+            deleteZeroSons(x);
             stack.push(x);
             stack.push("delete0");
         }
@@ -49,14 +48,12 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             stack.push(x);
             stack.push(successor);
             stack.push(successor.parent);
-            x.deleteTwoSons(successor);
+            deleteTwoSons(x,successor);
             stack.push("delete2");
         }
         else {//x has one children
-            x.deleteOneSon();
+            deleteOneSon(x);
             stack.push(x);
-            stack.push(x.parent);
-            stack.push(x.whichSon());       //string, was left or right son
             stack.push("delete1");
         }
     }
@@ -109,9 +106,9 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
         String action = (String) stack.pop();
         if (action.equals("insert")) {
             Node toRemove = (Node) stack.pop();
-            toRemove.deleteZeroSons();
             redoStack.push(toRemove);
             redoStack.push("insert");
+            deleteZeroSons(toRemove);
         }
         else {
             stack.push(action);
@@ -123,9 +120,9 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     public void retrack() {
         String action = (String) redoStack.pop();
         if (action.equals("insert"))
-            delete((Node) redoStack.pop());
-        else
             insert((Node) redoStack.pop());
+        else
+            delete((Node) redoStack.pop());
     }
 
     public void printPreOrder() {
@@ -159,39 +156,86 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             y.right = z;
     }
 
+    private void deleteZeroSons(Node toDel){
+        if (toDel.parent == null)
+            root = null;
+        else if (toDel.key < toDel.parent.key)
+            toDel.parent.left = null;
+        else
+            toDel.parent.right = null;
+    }
+
+    private void deleteOneSon(Node toDel){
+        if (toDel.left != null) { //i have only left son
+            if (toDel.parent == null)
+                root = toDel.left;
+            else if (toDel.key < toDel.parent.key) //im the left son
+                toDel.parent.left = toDel.left;
+            else                                  // im the right son
+                toDel.parent.right = toDel.left;
+
+            toDel.left.parent = toDel.parent;
+        }
+        else {                                      //i have only right son
+            if (toDel.parent == null)
+                root = toDel.right;
+            else if (toDel.key < toDel.parent.key)  //im left son
+                toDel.parent.left = toDel.right;
+            else                                    //im right son
+                toDel.parent.right = toDel.right;
+
+            toDel.right.parent = toDel.parent;
+        }
+    }
+
+    private void deleteTwoSons(Node toDel, Node mySuccessor){
+        if (mySuccessor.right == null)        //successor is a leaf
+            deleteZeroSons(mySuccessor);
+
+        else if (mySuccessor.right != null)      //successor has right son
+            deleteOneSon(mySuccessor);
+
+        //always- swap mySuccessor's fields with toDel's fields
+        mySuccessor.parent = toDel.parent;
+        mySuccessor.right = toDel.right;
+        mySuccessor.left = toDel.left;
+        if (mySuccessor.right!=null)
+            mySuccessor.right.parent = mySuccessor;
+        if (mySuccessor.left!=null)
+            mySuccessor.left.parent = mySuccessor;
+        if (mySuccessor.parent == null)
+            root = mySuccessor;
+    }
+
     private void insertbacktrack(){
         String action = (String) stack.pop();
         if (action.equals("delete0")){
             Node toinsert = (Node)stack.pop();
-            insert1(toinsert);
+            if (toinsert==null)
+                root=toinsert;
+            else if (toinsert.key< toinsert.parent.key)
+                toinsert.parent.left=toinsert;
+            else
+                toinsert.parent.right=toinsert;
             redoStack.push(toinsert);
             redoStack.push("delete");
         }
         else if (action.equals("delete1")) {
-            String side = (String) stack.pop();
-            Node father = (Node) stack.pop();
             Node toinsert = (Node) stack.pop();
-            redoStack.push(toinsert);
-            redoStack.push("delete");
-            if (side.equals("left")) {              //he was the left son
-                if (father.left.key < toinsert.key)
-                    toinsert.left = father.left;
-                else {
-                    toinsert.right = father.left;
-                }
-                //always
-                father.left = toinsert;
-                toinsert.parent = father;
-            } else if (side.equals("right")) {      //he was the right son
-                if (father.right.key > toinsert.key)
-                    toinsert.right = father.right;
-                else {
-                    toinsert.left = father.right;
-                }
-                //always
-                father.right = toinsert;
-                toinsert.parent = father;
-            }
+            if (toinsert.parent==null)                  //toinsert was the root
+                root=toinsert;
+            else if (toinsert.key<toinsert.parent.key)   //he was the left son
+                toinsert.parent.left = toinsert;
+            else                                        //he was the right son
+                toinsert.parent.right= toinsert;
+
+            if (toinsert.left != null)                        // had left son
+                toinsert.left.parent = toinsert;
+            else                                            // had right son
+                toinsert.right.parent = toinsert;
+
+                redoStack.push(toinsert);
+                redoStack.push("delete");
         }
         else{                                   //last delete had two sons
             Node wbf = (Node) stack.pop();     //wbf stands for will be father
@@ -269,113 +313,6 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             else
                 return "left";
         }
-
-        private void deleteZeroSons() {
-            if (whichSon().equals("left"))
-                parent.left = null;
-            else
-                parent.right = null;
-        }
-
-        private void deleteOneSon() {
-            if (whichSon().equals("left")) {
-                if (left != null) {
-                    parent.left = left;
-                    left.parent = parent;
-                } else {
-                    parent.left = right;
-                    right.parent = parent;
-                }
-            }
-            else {
-                if (left != null){
-                    parent.right = left;
-                    left.parent = parent;
-                }
-                else {
-                    parent.right = right;
-                    right.parent = parent;
-                }
-            }
-        }
-
-        private void deleteTwoSons(Node successor) {    //deletes this and replace with successor
-            if (successor.right != null)
-                successor.deleteOneSon();
-            else
-                successor.deleteZeroSons();
-            successor.parent = parent;
-            successor.left = left;
-            successor.right = right;
-            left.parent = successor;
-            right.parent = successor;
-            if (whichSon().equals("left"))
-                parent.left = successor;
-            else
-                parent.right = successor;
-        }
-
-    }
-    private void del(Node toDel){
-        //case1- leaf
-        if (toDel.left == null & toDel.right == null) {
-            if (toDel.parent == null)
-                root = null;
-            else if (toDel.key < toDel.parent.key)
-                toDel.parent.left = null;
-            else
-                toDel.parent.right = null;
-        }
-        //case2-one son
-        if ((toDel.left !=null & toDel.right == null) | (toDel.left == null & toDel.right != null)) {
-            if (toDel.left != null) { //i have only left son
-                if (toDel.parent == null) {
-                    root = toDel.left;
-                } else if (toDel.key < toDel.parent.key) {//im left son
-                    toDel.parent.left = toDel.left;
-                } else if (toDel.key > toDel.parent.key) {   // im right son
-                    toDel.parent.right = toDel.left;
-                }
-                toDel.left.parent = toDel.parent;
-            } else if (toDel.right != null) { //i have only right son
-                if (toDel.parent == null) {
-                    root = toDel.right;
-                } else if (toDel.key < toDel.parent.key) { //im left son
-                    toDel.parent.left = toDel.right;
-                } else if (toDel.key > toDel.parent.key) {   //im right son
-                    toDel.parent.right = toDel.right;
-                }
-                toDel.right.parent = toDel.parent;
-            }
-        }
-
-        //case3-two son
-        Node mySuccessor = successor(toDel);
-        if (mySuccessor.right == null){//successor is a leaf
-            if (mySuccessor.parent.key == toDel.key)
-                mySuccessor.parent.right = null;
-            else
-                mySuccessor.parent.left = null;
-        }
-
-        else if (mySuccessor.right != null) { //successor has right son
-            if (mySuccessor.parent.key == toDel.key){
-                mySuccessor.parent.right = mySuccessor.right;
-                mySuccessor.right.parent = mySuccessor.parent;
-            }
-            else {
-                mySuccessor.parent.left = mySuccessor.right;
-                mySuccessor.right.parent = mySuccessor.parent;
-            }
-        }
-        //always- swap toDel by mySuccessor
-        mySuccessor.parent = toDel.parent;
-        mySuccessor.right = toDel.right;
-        mySuccessor.left = toDel.left;
-        mySuccessor.right.parent = mySuccessor;
-        mySuccessor.left.parent = mySuccessor;
-        if (mySuccessor.parent == null)
-            root = mySuccessor;
     }
 }
 
