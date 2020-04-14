@@ -249,7 +249,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             if (right == null)
                 return this;
             else
-                return right.minimum();
+                return right.maximum();
         }
 
         private String printPreOrder(String output) {
@@ -315,6 +315,67 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 parent.right = successor;
         }
 
+    }
+    private void del(Node toDel){
+        //case1- leaf
+        if (toDel.left == null & toDel.right == null) {
+            if (toDel.parent == null)
+                root = null;
+            else if (toDel.key < toDel.parent.key)
+                toDel.parent.left = null;
+            else
+                toDel.parent.right = null;
+        }
+        //case2-one son
+        if ((toDel.left !=null & toDel.right == null) | (toDel.left == null & toDel.right != null)) {
+            if (toDel.left != null) { //i have only left son
+                if (toDel.parent == null) {
+                    root = toDel.left;
+                } else if (toDel.key < toDel.parent.key) {//im left son
+                    toDel.parent.left = toDel.left;
+                } else if (toDel.key > toDel.parent.key) {   // im right son
+                    toDel.parent.right = toDel.left;
+                }
+                toDel.left.parent = toDel.parent;
+            } else if (toDel.right != null) { //i have only right son
+                if (toDel.parent == null) {
+                    root = toDel.right;
+                } else if (toDel.key < toDel.parent.key) { //im left son
+                    toDel.parent.left = toDel.right;
+                } else if (toDel.key > toDel.parent.key) {   //im right son
+                    toDel.parent.right = toDel.right;
+                }
+                toDel.right.parent = toDel.parent;
+            }
+        }
+
+        //case3-two son
+        Node mySuccessor = successor(toDel);
+        if (mySuccessor.right == null){//successor is a leaf
+            if (mySuccessor.parent.key == toDel.key)
+                mySuccessor.parent.right = null;
+            else
+                mySuccessor.parent.left = null;
+        }
+
+        else if (mySuccessor.right != null) { //successor has right son
+            if (mySuccessor.parent.key == toDel.key){
+                mySuccessor.parent.right = mySuccessor.right;
+                mySuccessor.right.parent = mySuccessor.parent;
+            }
+            else {
+                mySuccessor.parent.left = mySuccessor.right;
+                mySuccessor.right.parent = mySuccessor.parent;
+            }
+        }
+        //always- swap toDel by mySuccessor
+        mySuccessor.parent = toDel.parent;
+        mySuccessor.right = toDel.right;
+        mySuccessor.left = toDel.left;
+        mySuccessor.right.parent = mySuccessor;
+        mySuccessor.left.parent = mySuccessor;
+        if (mySuccessor.parent == null)
+            root = mySuccessor;
     }
 }
 
