@@ -24,7 +24,7 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
     @Override
     public Integer search(int x) {
         Integer output = -1;
-        if (x<arr[minimum] | x>arr[maximum])
+        if (size<1 || x<arr[minimum] | x>arr[maximum])
             return output;
         for (int i = 0; i < size; i++) {
             if (arr[i] == x) {

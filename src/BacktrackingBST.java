@@ -2,12 +2,14 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     private Stack stack;
     private Stack redoStack;
     BacktrackingBST.Node root = null;
+    boolean retrack;
 
 
     // Do not change the constructor's signature
     public BacktrackingBST(Stack stack, Stack redoStack) {
         this.stack = stack;
         this.redoStack = redoStack;
+        retrack=false;
     }
 
     public Node getRoot() {
@@ -30,6 +32,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     }
 
     public void insert(BacktrackingBST.Node z) {
+        retrack=false;
         stack.push(z);
         stack.push("insert");
         insert1(z);
@@ -38,6 +41,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     //finished, except for the stuck pushing
     public void delete(Node x) {
+        retrack=false;
         BacktrackingBST T = new BacktrackingBST(stack,redoStack);
         if (x.left == null & x.right == null) {  //x has no children
             x.deleteZeroSons();
@@ -106,6 +110,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     @Override
     public void backtrack() {
+        retrack=true;
         String action = (String) stack.pop();
         if (action.equals("insert")) {
             Node toRemove = (Node) stack.pop();
@@ -121,11 +126,13 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
 
     @Override
     public void retrack() {
-        String action = (String) redoStack.pop();
-        if (action.equals("insert"))
-            delete((Node) redoStack.pop());
-        else
-            insert((Node) redoStack.pop());
+        if (retrack) {
+            String action = (String) redoStack.pop();
+            if (action.equals("insert"))
+                delete((Node) redoStack.pop());
+            else
+                insert((Node) redoStack.pop());
+        }
     }
 
     public void printPreOrder() {
@@ -136,6 +143,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
     public void print() {
         printPreOrder();
     }
+
 
 
     // assistance functions
@@ -209,14 +217,39 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 toinsert.right=mySuccessor.right;
                 toinsert.left=mySuccessor.left;
                 toinsert.parent=mySuccessor.parent;
+                toinsert.left.parent=toinsert;
+                toinsert.right.parent=toinsert;
                 mySuccessor.parent=wbf;
                 mySuccessor.right=wbf.left;
                 mySuccessor.left=null;
+                wbf.left.parent=mySuccessor;
                 wbf.left=mySuccessor;
             }
         }
     }
+    // TODO remove
+    public void treeFormPrint(){
+        if (root != null) treeFormPrint(root, "");
 
+    }
+    // TODO remove
+    private void treeFormPrint(Node node, String acc) {
+        String signSpace = acc + " ";
+        if (node.right != null) {
+            treeFormPrint(node.right, acc + " ");
+            if (node.right.parent == node)
+                System.out.println(signSpace + "/");
+            else System.out.println(signSpace + "$");
+        }
+        System.out.println(acc + "| key: " + node.key);
+        System.out.println(acc + "| par: " + node.parent);
+        if (node.left != null) {
+            if (node.left.parent == node)
+                System.out.println(signSpace + "\\");
+            else System.out.println(signSpace + "$");
+            treeFormPrint(node.left, acc + " ");
+        }
+    }
     public static class Node {
         //These fields are public for grading purposes. By coding conventions and best practice they should be private.
         public BacktrackingBST.Node left;
@@ -249,7 +282,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             if (right == null)
                 return this;
             else
-                return right.minimum();
+                return right.maximum();
         }
 
         private String printPreOrder(String output) {
@@ -264,7 +297,9 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
         }
 
         private String whichSon() {
-            if (key > parent.key)
+            if (parent==null)
+                return "root";
+            else if (key > parent.key)
                 return "right";
             else
                 return "left";
@@ -311,11 +346,35 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             right.parent = successor;
             if (whichSon().equals("left"))
                 parent.left = successor;
-            else
+            else if (whichSon().equals("right"))
                 parent.right = successor;
         }
 
+        @Override
+        public String toString(){return ""+key;}
     }
+
+    public static void main(String[] args) {
+        BacktrackingBST T = new BacktrackingBST(new Stack(), new Stack());
+        BacktrackingBST.Node todelete1 = new BacktrackingBST.Node(3,6);
+        BacktrackingBST.Node todelete2= new BacktrackingBST.Node(10,6);
+        BacktrackingBST.Node todelete3 = new BacktrackingBST.Node(0,6);
+        BacktrackingBST.Node todelete4 = new BacktrackingBST.Node(5,6);
+        BacktrackingBST.Node todelete5 = new BacktrackingBST.Node(8,6);
+        BacktrackingBST.Node todelete6 = new BacktrackingBST.Node(7,6);
+
+        T.insert(todelete1);
+        T.insert(todelete2);
+        T.insert(todelete3);
+        T.insert(todelete4);
+        T.insert(todelete5);
+        T.insert(todelete6);
+
+        System.out.println(T.minimum().key);
+        System.out.println(T.maximum().key);
+
+    }
+
 }
 
 
