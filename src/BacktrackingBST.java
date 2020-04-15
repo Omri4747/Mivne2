@@ -277,7 +277,9 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 toinsert.left.parent = toinsert;
                 mySuccessor.left=null;
                 toinsert.right=mySuccessor;
-                if (toinsert.parent.key > toinsert.key)
+                if (toinsert.parent==null)
+                    root=toinsert;
+                else if (toinsert.parent.key > toinsert.key)
                     toinsert.parent.left = toinsert;
                 else
                     toinsert.parent.right = toinsert;
