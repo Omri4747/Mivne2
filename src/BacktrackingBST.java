@@ -142,7 +142,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 Node mySuccessor = (Node) redoStack.pop();
                 Node toDel = (Node) redoStack.pop();
                 stack.push(toDel);
-                stack.push(mySuccessor);
+                stack.push(mySuccessor.parent);
                 stack.push("delete2");
                 deleteTwoSons(toDel,mySuccessor);
             }
