@@ -1,7 +1,7 @@
 public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     private Stack stack;
     private int[] arr;
-    private Integer size;
+    private Integer size;       //pointer to the next empty cell
 
     // Do not change the constructor's signature
     public BacktrackingSortedArray(Stack stack, int size) {
@@ -11,7 +11,7 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     }
     @Override
     public Integer get(int index){
-        if (!rangecheck(index))
+        if (!rangecheck(index))          //if index is illegal
             return null;
         return arr[index];
     }
@@ -20,9 +20,9 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     public Integer search(int x) {
         int output = -1;
         boolean found = false;
-        int middle = size / 2;
+        int middle = size/2;
         int low = 0;
-        int high = size - 1;
+        int high = size-1;
         while (!found & low <= high) {
             if (arr[middle] == x) {
                 output = middle;
@@ -42,65 +42,65 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
 
     @Override
     public void insert(Integer x) {
-        stack.push(toInsert(x));
+        stack.push(toInsert(x));         //using the assistance function below, & pushing the index that returns from it
         stack.push("insert");
     }
 
     //sorting a sorted array with 1 element unsorted at the end of the array
     // and return the index it was inserted
     private int toInsert(Integer x){
-        arr[size]=x;
-        size++;
+        arr[size]=x;                          //adding the value to the end of the array
+        size++;                               //updating size
         int i=size-1;
-        while (i>0 && x<arr[i-1]){
-            arr[i]=arr[i-1];
+        while (i>0 && x<arr[i-1]){            //finds the correct cell to insert x
+            arr[i]=arr[i-1];                  //moves all the elements one cell to the right
             arr[i-1]=x;
             i--;
         }
         return i;
     }
 
-
     @Override
     public void delete(Integer index) {
-        if (rangecheck(index)) {
-            stack.push(arr[index]);
+        if (rangecheck(index)) {              //checks index is legal
+            stack.push(arr[index]);           //push the value that will be deleted
             stack.push("delete");
-            toDelete(index);
+            toDelete(index);                  //using the assistance function below
         }
     }
 
     private void toDelete (Integer index){
-        for (int i = index; i < size - 1; i++) {
+        for (int i = index; i < size - 1; i++) {    //moves all the elements from the right side of value arr[index], one cell to the left
             arr[i] = arr[i + 1];
         }
-        arr[size - 1] = 0;
-        size--;
+        arr[size - 1] = 0;                          //deleting the duplicated value that created in the last two cells
+        size--;                                     //updating size
     }
 
     @Override
     public Integer minimum() {
-        if (size==0)
+        if (size==0)            //empty array
             return -1;
         else
-            return 0;
+            return 0;          //minimum is always in cell 0 in a sorted array
     }
 
     @Override
     public Integer maximum() {
-        if (size==0)
+        if (size==0)           //empty array
             return -1;
         else
-            return size-1;
+            return size-1;    //maximum is always in the last cell in a sorted array
     }
 
     @Override
     public Integer successor(Integer index) {
         Integer output = -1;
+        //checks legal index, successor of maximum, there are more than one occurrence of maximum
         if (!rangecheck(index) || (index==size-1) | arr[index]==arr[size-1])
             return output;
 
-        for (int i=index+1;i<size;i++){
+        for (int i=index+1;i<size;i++){     //finds the first occurrence of value different than arr[index]
             if (arr[index]<arr[i]) {
                 output = i;
                 break;
@@ -112,9 +112,10 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
     @Override
     public Integer predecessor(Integer index) {
         Integer output = -1;
+        //checks legal index, predecessor of minimum, there are more than one occurrence of minimum
         if (!rangecheck(index) || (index==0) | arr[index]==arr[0])
             return output;
-        for (int i=index-1;i>=0;i--){
+        for (int i=index-1;i>=0;i--){        //finds the first occurrence of value different than arr[index]
             if (arr[index]>arr[i]) {
                 output = i;
                 break;
@@ -125,14 +126,14 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
 
     @Override
     public void backtrack() {
-        if (!stack.isEmpty()) {
+        if (!stack.isEmpty()) {                     //ensures that action(insert or delete) was applied before
             Object action = stack.pop();
             Integer value = (Integer) stack.pop();
             if (action.equals("delete")) {
-                toInsert(value);
+                toInsert(value);                    //backtracking delete is inserting, using assistance function
             }
             else if (action.equals("insert")) {
-                toDelete(value);
+                toDelete(value);                    //backtracking insert is deleting, using assistance function
             }
         }
     }
@@ -152,27 +153,9 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
         }
     }
 
+    //assistance function to ensure index is legal
     private boolean rangecheck(int index){
         return (index >=0 & index<size);
     }
 
-    public static void main(String[] args) {
-        Stack st = new Stack();
-        BacktrackingSortedArray A = new BacktrackingSortedArray(st,100);
-        for (int i=0;i<5;i++){
-            A.insert(i);
-        }
-        A.print();
-        System.out.println("\n");
-        for (int i=0;i<5;i++){
-            A.backtrack();
-        }
-        A.print();
-//        System.out.println("\n");
-//        for (int i=0;i<10;i++){
-//            A.backtrack();
-//            A.print();
-//            System.out.println("\n");
-
-    }
 }
