@@ -137,6 +137,7 @@ public class BacktrackingArray implements Array<Integer>, Backtrack {
                 arr[index] = value;                       //fill the empty cell with the deleted value
                 size++;                                   //updating size
             }
+            System.out.println("backtracing performed");
         }
     }
 

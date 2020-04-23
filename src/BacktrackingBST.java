@@ -123,6 +123,7 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
             else {
                 insertbacktrack(action);      //reversing delete
             }
+            System.out.println("backtracing performed");
         }
     }
 
@@ -323,30 +324,6 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
         }
     }
 
-    // TODO remove
-    public void treeFormPrint(){
-        if (root != null) treeFormPrint(root, "");
-
-    }
-    // TODO remove
-    private void treeFormPrint(Node node, String acc) {
-        String signSpace = acc + " ";
-        if (node.right != null) {
-            treeFormPrint(node.right, acc + " ");
-            if (node.right.parent == node)
-                System.out.println(signSpace + "/");
-            else System.out.println(signSpace + "$");
-        }
-        System.out.println(acc + "| key: " + node.key);
-        System.out.println(acc + "| par: " + node.parent);
-        if (node.left != null) {
-            if (node.left.parent == node)
-                System.out.println(signSpace + "\\");
-            else System.out.println(signSpace + "$");
-            treeFormPrint(node.left, acc + " ");
-        }
-    }
-
     public static class Node {
         //These fields are public for grading purposes. By coding conventions and best practice they should be private.
         public BacktrackingBST.Node left;
@@ -390,10 +367,6 @@ public class BacktrackingBST implements Backtrack, ADTSet<BacktrackingBST.Node> 
                 output = right.printPreOrder(output + " ");   //My right sub tree
             return output;
         }
-
-        @Override
-        public String toString()
-        {return ""+key;}
     }
 }
 

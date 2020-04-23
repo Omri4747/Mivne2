@@ -135,6 +135,7 @@ public class BacktrackingSortedArray implements Array<Integer>, Backtrack {
             else if (action.equals("insert")) {
                 toDelete(value);                    //backtracking insert is deleting, using assistance function
             }
+            System.out.println("backtracing performed");
         }
     }
 
